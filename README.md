@@ -32,11 +32,19 @@ Open <http://127.0.0.1:8000>. API documentation is at <http://127.0.0.1:8000/doc
 
 ## Deployment configuration
 
-The included `Dockerfile` reads the hosting platform's `PORT` and stores SQLite at `/data/money_field_guide.db`. `render.yaml` describes a Render Docker service with a persistent disk.
+### Deploy the live app on Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/badrc15/money-field-guide)
+
+The app includes a Render Blueprint in `render.yaml`. Use the button above to connect the GitHub repository and create the free web service. Render builds the included Dockerfile and serves both the guide and its market/news API. After setup, pushes to the connected Git branch can trigger new deploys.
+
+Render's free web services sleep after inactivity and may take about a minute to wake on the next visit. They do not have persistent disks, so local SQLite files are temporary and are recreated after a restart. The app currently uses SQLite only to initialize an empty lesson-progress table; no lesson progress is stored.
+
+GitHub Pages can host static files, but it cannot run this app's Python API. Use Render for the live scout and headlines.
 
 ```bash
 docker build -t money-field-guide .
-docker run --rm -p 8000:8000 -v money-field-data:/data money-field-guide
+docker run --rm -p 8000:8000 money-field-guide
 ```
 
-This project is not deployed or published. Public deployment will require reviewing third-party market-data and RSS terms, uptime, rate limits, and privacy needs.
+The live scout and headlines depend on third-party providers and can be delayed or unavailable. Review provider terms and rate limits before running the app as a commercial service.
