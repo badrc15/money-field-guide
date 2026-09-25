@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: money-field-guide
-    runtime: docker
-    plan: free
-    healthCheckPath: /
