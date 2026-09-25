@@ -1,5 +1,12 @@
 // Lesson: the browser requests source-tagged JSON; Python gathers and labels signals.
 const $ = selector => document.querySelector(selector);
+const staticPages = location.hostname.endsWith('github.io');
+const dataUrl = (kind, refresh) => {
+  if (!staticPages) return `/api/${kind}${refresh ? '?refresh=true' : ''}`;
+  const url = new URL(`data/${kind}.json`, document.baseURI);
+  if (refresh) url.searchParams.set('refresh', Date.now());
+  return url.href;
+};
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const safeHref = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : '#'; } catch { return '#'; } };
 const timeLabel = value => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? '' : new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/London'}).format(date); };
@@ -50,7 +57,7 @@ async function loadScout(refresh=false) {
   const button = $('#refresh-scout');
   button.disabled = true;
   try {
-    const response = await fetch('/api/scout'+(refresh?'?refresh=true':''));
+    const response = await fetch(dataUrl('scout', refresh));
     const data = await response.json();
     if (!response.ok) throw new Error('Market scan unavailable.');
     renderScout(data);
@@ -79,7 +86,7 @@ async function loadNews(refresh=false) {
   const button = $('#refresh-news');
   button.disabled = true;
   try {
-    const response = await fetch('/api/news'+(refresh?'?refresh=true':''));
+    const response = await fetch(dataUrl('news', refresh));
     const data = await response.json();
     if (!response.ok) throw new Error('News feed unavailable.');
     renderNews(data);
