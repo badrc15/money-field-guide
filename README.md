@@ -27,24 +27,22 @@ Open <http://127.0.0.1:8000>. API documentation is at <http://127.0.0.1:8000/doc
 - The scan covers CoinGecko's top 60 by market capitalization and a fixed set of eight large US stocks. It is not a broad universe search and can miss smaller, newer, or non-US assets.
 - “Recent swing” is high-to-low movement over 24 hours for crypto and the latest daily session for stocks. The cutoffs (under 3%, 3–8%, 8% or more) are simple teaching labels, not a full volatility model, suitability assessment, or judgement that an asset is a good/bad investment. The market change windows also differ (7 calendar days vs 5 sessions).
 - The scout ranks recent historical change. Momentum can reverse and is not evidence that an asset will make a large future move. It does not generate buy or sell recommendations.
-- The daily list fetches CoinDesk and BBC Business RSS on page load, caches for one hour, and refreshes while the page remains open. It does not run a background scheduler while nobody is using the app. It shows attributed headlines linking to the publishers. Review RSS terms and obtain any needed permissions before operating a public or commercial service.
+- The daily list uses attributed CoinDesk and BBC Business RSS headlines. On GitHub Pages, a scheduled GitHub Actions build refreshes the static headline snapshot about hourly. Review RSS terms and obtain any needed permissions before operating a public or commercial service.
 - The editorial guide is general learning material, not personalized financial, investment, tax, or legal advice. Its UK ISA examples have dates and official links because rules can change. Verify current rules before acting.
 
-## Deployment configuration
+## GitHub Pages deployment
 
-### Deploy the live app on Render
+The GitHub Actions workflow in `.github/workflows/pages.yml` publishes the HTML, CSS, and JavaScript on pushes to `main` and refreshes the static market/news snapshots hourly. GitHub Pages serves the site from the project repository at <https://badrc15.github.io/money-field-guide/>.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/badrc15/money-field-guide)
+For the first deployment, open **Settings → Pages** in this repository and set **Build and deployment → Source** to **GitHub Actions**. After that, the workflow deploys updates automatically. Scheduled refreshes depend on GitHub Actions availability and market/news provider limits.
 
-The app includes a Render Blueprint in `render.yaml`. Use the button above to connect the GitHub repository and create the free web service. Render builds the included Dockerfile and serves both the guide and its market/news API. After setup, pushes to the connected Git branch can trigger new deploys.
+GitHub Pages cannot run Python, so the hosted scout and headlines use JSON snapshots generated during each Pages build. For a local version with on-demand API refreshes, run:
 
-Render's free web services sleep after inactivity and may take about a minute to wake on the next visit. They do not have persistent disks, so local SQLite files are temporary and are recreated after a restart. The app currently uses SQLite only to initialize an empty lesson-progress table; no lesson progress is stored.
-
-GitHub Pages can host static files, but it cannot run this app's Python API. Use Render for the live scout and headlines.
-
-```bash
-docker build -t money-field-guide .
-docker run --rm -p 8000:8000 money-field-guide
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
 The live scout and headlines depend on third-party providers and can be delayed or unavailable. Review provider terms and rate limits before running the app as a commercial service.
