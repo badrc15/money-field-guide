@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: money-field-guide
+    runtime: docker
+    plan: starter
+    healthCheckPath: /
+    disk:
+      name: money-field-data
+      mountPath: /data
+      sizeGB: 1

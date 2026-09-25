@@ -40,4 +40,3 @@ docker run --rm -p 8000:8000 -v money-field-data:/data money-field-guide
 ```
 
 This project is not deployed or published. Public deployment will require reviewing third-party market-data and RSS terms, uptime, rate limits, and privacy needs.
-
